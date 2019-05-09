@@ -1,0 +1,120 @@
+.foundation-layout-panel-bodywrapper {
+	height: ~"calc(100% - 50px)";
+}
+/* For Resizable Containers Z*/
+
+html,
+body {
+  height: 100%;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+}
+
+.log-panel {
+    flex: 1 1 auto;
+    min-width:150px;
+    height:100%;
+    .granite-actionbar {
+		background-color: #656565; 
+	    color: #fff;
+    }
+    .log-title {
+		color:#fff;
+        text-transform:uppercase;
+        font-size:0.9rem;
+    }
+    .log-panel-header {
+		height:50px;
+        display: block;
+        .advanced-log-config {
+			margin-right:10px;
+        }
+    }
+    .log-result {
+		overflow:auto;
+		height: ~"calc(100% - 50px)";
+        white-space:pre-wrap;
+        margin:0;
+
+        span {
+			width: 100%;
+            display: inline-block;
+        }
+
+        .error {
+            background-color: rgb(255,200,200);
+            &:hover{
+                background-color: rgb(255,100,100);
+            }
+        }
+        
+        .warn {
+            background-color: rgb(255,200,150);
+            &:hover{
+                background-color: rgb(255,130,80);
+            }
+        }
+        
+        .info {
+            background-color: rgb(240,255,200);
+            &:hover{
+                background-color: rgb(190,255,150);
+            }
+        }
+        
+        .stack {
+            display:inline-block;
+            overflow:hidden;
+            width:100%;
+            height:auto;
+            .stack-icon {
+                font-family: "AdobeSpectrumIcons18";
+                cursor: pointer;
+				&:before {
+                	content: "\f2d3";//minus icon (if its open you collapse it)
+            	}
+            }
+			&.closed {
+                height: 1em;
+                .stack-icon:before{
+                	content: "\f106";//plus icon (if its closed you expand it.)
+            	}
+            }
+        }
+
+    }
+}
+
+
+.granite-actionbar-right{
+	margin-right:10px;
+	coral-select{
+		margin-right:10px;
+    }
+}
+
+
+
+
+
+.panel-container {
+  display: flex;
+  flex-direction: row;  
+  flex-wrap: nowrap;
+  width: 100%;
+  height:100%;
+}
+
+.hidden {
+	display:none;
+}  
+
+.splitter {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 100%;
+    cursor: col-resize;  
+    background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #656565;
+}

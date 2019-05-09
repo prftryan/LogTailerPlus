@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>Log Tailer Plus</title>
+        <sly data-sly-use.clientlib="/libs/granite/sightly/templates/clientlib.html">
+            <sly data-sly-call="${clientlib.css @ categories='acs-commons.log-tailer-plus.app'}"/>
+			<sly data-sly-call="${clientlib.css @ categories=['coralui3','granite.ui.coral.foundation','granite.ui.shell']}"/>
+        </sly>
+		<link rel="shortcut icon" href="/apps/acs-commons/components/utilities/manage-controlled-processes/clientlibs/images/favicon.ico" />
+    </head>
+    <body class="coral--light" data-sly-use.logtailerplus="logtailerplus.core.models.LogTailerPlus">
+        <coral-shell>
+            <coral-shell-header class="coral--dark">
+                <coral-shell-header-home  data-globalnav-navigator-main-href="/mnt/overlay/granite/ui/content/shell/globalnav.html">
+                    <a is="coral-shell-homeanchor" icon="adobeExperienceManagerColor" href="/">Adobe Experience Manager</a>
+                </coral-shell-header-home>
+                <coral-shell-header-actions>
+                </coral-shell-header-actions>
+            </coral-shell-header>
+            <coral-shell-content role="main">
+                <div id="granite-shell-content" class="foundation-layout-panel">
+                    <div class="foundation-layout-panel-header">
+                        <div id="granite-shell-actionbar" class="granite-actionbar foundation-collection-actionbar" data-foundation-collection-actionbar-target="#cq-siteadmin-admin-childpages">
+                            <div class="granite-actionbar-centerwrapper">
+                                <div class="granite-actionbar-center"><span class="granite-title" role="heading" aria-level="1">Log Tailer Plus</span></div>
+                            </div>
+                            <div class="granite-actionbar-left"></div>
+                            <div class="granite-actionbar-right">
+                                <coral-select class='selectedLog' placeholder="Select Log...">
+                                      <coral-select-item data-sly-repeat=${logtailerplus.logNames}>
+										${item}
+                                      </coral-select-item>
+                                    </coral-select>
+								<button is="coral-button" icon="addCircle" iconsize="S" class="addTailer">Add Log</button>
+                            </div>
+                        </div>                    
+                    </div>
+                    <div class="foundation-layout-panel-bodywrapper">
+                        <div class="foundation-layout-panel-body">
+                            <div class="foundation-layout-panel-content">
+                            	<div class="panel-container">
+									<!--/*logs go here...*/-->                                                        
+                            	</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </coral-shell-content>
+            <coral-dialog class="advanced-properties-dialog">
+			  <coral-dialog-header>Log Properties</coral-dialog-header>
+			  <coral-dialog-content>This is where you will customize the log tailing configs.</coral-dialog-content>
+			  <coral-dialog-footer><button is="coral-button" variant="primary" coral-close="" class="coral-Button coral-Button--primary" size="M"><coral-button-label>Update</coral-button-label></button></coral-dialog-footer>
+			</coral-dialog>
+        </coral-shell>
+<sly data-sly-call="${clientlib.js 
+@ categories=['coralui3','granite.ui.coral.foundation','granite.ui.shell']}"/>
+        <sly data-sly-call="${clientlib.js 
+@ categories='acs-commons.log-tailer-plus.app'}"/>
+    </body>
+</html>

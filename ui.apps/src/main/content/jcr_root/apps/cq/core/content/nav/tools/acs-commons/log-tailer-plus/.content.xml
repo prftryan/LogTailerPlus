@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:description="Better skin for viewing logs."
+    jcr:primaryType="nt:unstructured"
+    jcr:title="Log Tailer"
+    href="/etc/acs-commons/log-tailer-plus.html"
+    id="acs-commons__log-tailer-plus"
+    target="_blank"/>
