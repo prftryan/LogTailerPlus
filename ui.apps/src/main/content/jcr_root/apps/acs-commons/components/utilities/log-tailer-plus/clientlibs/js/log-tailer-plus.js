@@ -1,32 +1,32 @@
 //TODO: Write a log panel class to make frequent children/property requests easier.
 LogTailerPlus = {
-    init: function () {
-    //ToDo: Add all logs specified by query param (if any) and if not load error.log...
+    init: () => {
+    //ToDo: Preserve open logs from session (if any) and if not load error.log...
         LogTailerPlus.addLogPanel(LogTailerPlus.Constants.DEFAULT_LOGGER,
             LogTailerPlus.Constants.DEFAULT_REFRESH,
             LogTailerPlus.Constants.DEFAULT_GREP,
             LogTailerPlus.Constants.DEFAULT_SCROLL);
 
-        $(document).on("click","."+LogTailerPlus.Constants.STACK_ICON_CLASS,function(event){
+        $(document).on("click","."+LogTailerPlus.Constants.STACK_ICON_CLASS, (event) => {
             LogTailerPlus.toggleStack($(event.currentTarget).parent());
         });
 
-        $(document).on("click","."+LogTailerPlus.Constants.ADVANCED_LOG_CONFIG_CLASS, function(){
-			LogTailerPlus.launchDialog(this);
+        $(document).on("click","."+LogTailerPlus.Constants.ADVANCED_LOG_CONFIG_CLASS, (event) => {
+			LogTailerPlus.launchDialog(event.currentTarget);
         }),
 
-        $(document).on("click","."+LogTailerPlus.Constants.REMOVE_TAILER_CLASS, function(){
-		    LogTailerPlus.removeLogPanel(this);
+        $(document).on("click","."+LogTailerPlus.Constants.REMOVE_TAILER_CLASS, (event) => {
+		    LogTailerPlus.removeLogPanel(event.currentTarget);
 		});
 
-        $(document).on("click","."+LogTailerPlus.Constants.SCROLL_SWITCH_CLASS,function(){
-            LogTailerPlus.toggleScroll($(this).closest("."+LogTailerPlus.Constants.LOG_PANEL_CLASS));
+        $(document).on("change","."+LogTailerPlus.Constants.SCROLL_SWITCH_CLASS,(event) => {
+            LogTailerPlus.toggleScroll(event.currentTarget);
         });
 
-		$(document).on("click","."+LogTailerPlus.Constants.ADD_TAILER_CLASS,function(){
+		$(document).on("click","."+LogTailerPlus.Constants.ADD_TAILER_CLASS,() => {
             var selectedValue = LogTailerPlus.getSelectedLogger();
             if( selectedValue.length > 0 ){
-                var logName = selectedValue.startsWith("/") ? selectedValue:slingHome+selectedValue;
+                var logName = selectedValue.startsWith("/") ? selectedValue:"/"+selectedValue;
                 LogTailerPlus.addLogPanel(   logName,
                                         LogTailerPlus.Constants.DEFAULT_REFRESH,
                                         LogTailerPlus.Constants.DEFAULT_GREP,
@@ -37,8 +37,8 @@ LogTailerPlus = {
         });
 	},
 
-    getHtmlTemplate: function(logger,refresh,grep,scroll){
-        var isPinned = scroll === LogTailerPlus.Constants.SCROLL_PIN;
+    getHtmlTemplate: (logger,refresh,grep,scroll) => {
+        var checked = scroll === LogTailerPlus.Constants.SCROLL_PIN ? 'checked':'';
         return	`<div class='${LogTailerPlus.Constants.LOG_PANEL_CLASS}'
                     ${LogTailerPlus.Constants.DATA_LOGGER}='${logger}'
                     ${LogTailerPlus.Constants.DATA_REFRESH}='${refresh}'
@@ -53,7 +53,7 @@ LogTailerPlus = {
                                 </div>
                             </div>
         					<div class='granite-actionbar-left'>
-        					    <coral-switch class='${LogTailerPlus.Constants.SCROLL_SWITCH_CLASS}' checked='${isPinned}'></coral-switch>
+        					    <coral-switch value="${LogTailerPlus.Constants.SCROLL_PIN}" class='${LogTailerPlus.Constants.SCROLL_SWITCH_CLASS}' ${checked}></coral-switch>
                                 <coral-icon id="pinOff" icon="pinOff" size="S" title="Select to pin scroll at current location"></coral-icon>
         					</div>
 					   		<div class='granite-actionbar-right'>
@@ -71,60 +71,94 @@ LogTailerPlus = {
         a template used for the resizing splitter (jquery resize)
         also serves as divider for between loggers if multiple selected.
     */
-    getSplitterTemplate: function(logger){
+    getSplitterTemplate: (logger) => {
         return `<div class='${LogTailerPlus.Constants.SPLITTER_CLASS} ${LogTailerPlus.Constants.HIDDEN_CLASS}'
                     ${LogTailerPlus.Constants.DATA_LOGGER}='${logger}' />`
     },
     /*
         Utility function to retrieve whatever is currently selected in the "add log" form.
     */
-    getSelectedLogger: function(){
+    getSelectedLogger: ()=> {
         var selected = "";
         var selectField = $("."+LogTailerPlus.Constants.SELECTED_LOG_CLASS).get(0);
-        var slingHome = "/";//tailer.txt actually prepends slinghome for you, we just need to add a / if its relative.
         if( selectField.selectedItem && selectField.selectedItem.value
-                && selectField.selectedValue.length > 0){
+                && selectField.selectedItem.value.length > 0){
             selected = selectField.selectedItem.value;
         }
         return selected;
     },
     /* Standard/OOTB Logging format Regex for log levels - for use with built-in highlighting support */
-    getDefaultLogLevelRegex: function(logLevel){
+    getDefaultLogLevelRegex: (logLevel) => {
 		return new RegExp("([^\\n<>a-zA-Z]+[*]?"+logLevel+"[*]?[^\\n]+)","g");
     },
     /* to update logging configs, we set data attributes for the given configurations that the tailLog will
         read from automagically
      */
-    launchDialog: function(btn){
+    launchDialog: (btn) => {
         var dialog = $("."+LogTailerPlus.Constants.ADVANCED_DIALOG_CLASS).get(0);
-        if( dialog ){
-            var panel = $(btn).closest("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
-            var logName = panel.attr(LogTailerPlus.Constants.DATA_LOGGER);
-            var refresh = panel.attr(LogTailerPlus.Constants.DATA_REFRESH);
-            var grep = panel.attr(LogTailerPlus.Constants.DATA_GREP);
-            dialog.set({
-                header: {
-                    innerHTML: "Advanced Configuration: <b>"+logName+"</b>"
-                },
+        var $panel = $(btn).closest("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
+
+        if( !dialog ){
+            //first click, lets create the dialog on the fly.
+            dialog = new Coral.Dialog().set({
+                class: LogTailerPlus.Constants.ADVANCED_DIALOG_CLASS,
                 content: {
-                    innerHTML: "Refresh: "+refresh + "<br/>Grep: "+grep
+                    innerHTML: LogTailerPlus.generateDialogForm($panel).prop('outerHTML')
+                },
+                footer: {
+                    innerHTML: `<button is="coral-button" variant="secondary" coral-close>Cancel</button><button is="coral-button" variant="primary" coral-close>Update</button>`
                 }
             });
-            dialog.show();
-        }else{
-            console.log("Error: No Dialog Found");
+            dialog.on("close",()=>{
+                    console.log("Closed");
+            });
+            $("."+LogTailerPlus.Constants.PANEL_CONTAINER_CLASS).append(dialog);
         }
+        var logName = $panel.attr(LogTailerPlus.Constants.DATA_LOGGER);
+        dialog.set({
+            header: {
+                innerHTML: "Advanced Configuration: <b>"+logName+"</b>"
+            }
+        });
+        $("input[name="+LogTailerPlus.Constants.DATA_LOGGER+"]").val(logName);//set the hidden field value.
+        dialog.show();
     },
-    toggleScroll: function($logPanel){
-        var curValue = $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL);
-        var newValue = curValue === LogTailerPlus.Constants.SCROLL_FOLLOW ?
+    generateDialogForm: ($panel) => {
+        var $dialogWrapper = $(`<section class="coral-Form-fieldset"></section>`);
+        $dialogWrapper.append(LogTailerPlus.createFormInput("Logger:" ,
+                                            LogTailerPlus.Constants.DATA_LOGGER,
+                                            $panel.attr(LogTailerPlus.Constants.DATA_LOGGER),
+                                            true));
+        $dialogWrapper.append(LogTailerPlus.createFormInput("Refresh:",
+                                            LogTailerPlus.Constants.DATA_REFRESH,
+                                            $panel.attr(LogTailerPlus.Constants.DATA_REFRESH),
+                                            false));
+        $dialogWrapper.append(LogTailerPlus.createFormInput("GREP:",
+                                            LogTailerPlus.Constants.DATA_GREP,
+                                            $panel.attr(LogTailerPlus.Constants.DATA_GREP),
+                                            false));
+        var $dialogForm = $(`<form class='${LogTailerPlus.Constants.ADV_LOG_CONFIG_FORM} ${LogTailerPlus.Constants.CORAL_FORM_CLASS}'></form>`);
+        $dialogForm.append($dialogWrapper);
+        return $dialogForm;
+    },
+    createFormInput: (label,name,value,readonly) => {
+        var readonlyStr = readonly === true ? "readonly":'';
+        var wrapper = $(`<div class="coral-Form-fieldwrapper"></div>`);
+        wrapper.append(`<label class="coral-Form-fieldlabel">${label}</label>`);
+        wrapper.append(`<input is="coral-textfield" name="${name}" value="${value}" ${readonlyStr}>`);
+       return wrapper;
+    },
+    /* Use the switch/btn to toggle the data-scroll attribute between pin and follow */
+    toggleScroll: (btn) => {
+        var $logPanel = $(btn).closest("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
+        var newValue = btn.checked === true ?
             LogTailerPlus.Constants.SCROLL_PIN:LogTailerPlus.Constants.SCROLL_FOLLOW;
         $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL,newValue);
     },
     /* Any content that doesn't match built-in or user highlighting is identified as "stack"
         and can be collapsed.  This is simple class toggler for that (CSS Based) functionality.
     */
-    toggleStack: function(stack) {
+    toggleStack: (stack) => {
         if( !stack.hasClass(LogTailerPlus.Constants.STACK_CLOSED_CLASS) ){
             stack.addClass(LogTailerPlus.Constants.STACK_CLOSED_CLASS);
         }else{
@@ -132,10 +166,9 @@ LogTailerPlus = {
         }
     },
     /* get request to the tailer.txt OOTB logging service */
-    queryLog: function($logPanel) {
+    queryLog: ($logPanel) => {
         var logName = $logPanel.attr(LogTailerPlus.Constants.DATA_LOGGER);
         var queryReturn;
-
         if( logName && logName.length > 0 ){
             var queryData = {};
             var grep = $logPanel.attr(LogTailerPlus.Constants.DATA_GREP);
@@ -150,11 +183,11 @@ LogTailerPlus = {
                 data: queryData,
                 dataType:"text",
                 //This fixes an odd firefox issue due to tailer.txt setting wrong mime-type in its response...
-                beforeSend: function(x) {
-                                if(x && x.overrideMimeType){
-                                    x.overrideMimeType("text/plain;charset=UTF-8");
-                                }
-                            }
+                beforeSend: (xhr) => {
+                    if(xhr && xhr.overrideMimeType){
+                        xhr.overrideMimeType("text/plain;charset=UTF-8");
+                    }
+                }
             });
         }else{
             console.log("Warn: No Log Name found to query");
@@ -165,7 +198,7 @@ LogTailerPlus = {
     /* This method will take the log response (plain text) and wrap contents with span's and classes based on
        both pre-set highlighting rules (TODO: as well as authored)
     */
-    formatResponse: function(logContents){
+    formatResponse: (logContents) => {
         var lines = logContents.split("\n");
         var newLines = [];
         var emptyLines = [];
@@ -178,7 +211,7 @@ LogTailerPlus = {
 
             	if( logLevel && logLevel.length > 0){          
                     line = line.replace(regex, 
-                       	function(match,$1,index){
+                       (match,$1,index) => {
 							replaced++;
                         	return "<span class='"+logLevel.toLowerCase()+"'>"+$1+"</span>"
                     	});                   
@@ -214,7 +247,7 @@ LogTailerPlus = {
 
     },
     /* Determines delta content based on the current container and the string of new log messages */
-    getDelta: function($logPanel, newContent){
+    getDelta: ($logPanel, newContent) => {
 		//if there is no content, new content is delta...
         var delta = newContent;
 
@@ -230,21 +263,25 @@ LogTailerPlus = {
             }
             //use that bottom line to find index of new log contents (if any)
             if( lastLine && lastLine.length > 0 ){
-                if( newContent.indexOf(lastLine) >= 0 ){
-	                delta = newContent.substr(newContent.indexOf(lastLine)+lastLine.length);
+                if( newContent.lastIndexOf(lastLine) >= 0 ){
+	                delta = newContent.substr(newContent.lastIndexOf(lastLine)+lastLine.length);
                 }
             }
         }
         return delta;
     },
     /* appends net new content to log result container*/
-    appendLog: function($logResult,logContents){
+    appendLog: ($logResult,logContents) =>{
         //in case we need to do any other logic before appending, lets keep this separate.
-         $logResult.append(logContents);
-         return;
+        var appended = false;
+        if( logContents && logContents.length > 0){
+            $logResult.append(logContents);
+            appended = true;
+        }
+         return appended;
     },
     /* Simple method to scroll the log window to either bottom or wherever was pinned */
-    scrollLog: function($logPanel,scrollType){
+    scrollLog: ($logPanel) => {
         var $logResult = $logPanel.children("."+LogTailerPlus.Constants.LOG_RESULT_CLASS);
         var scrollType = $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL);
         var scrollTo;
@@ -262,7 +299,7 @@ LogTailerPlus = {
         (if refresh === 0 it will run only once)
 
     **/
-    tailLog: function($logPanel){
+    tailLog: ($logPanel) => {
         //this method handles polling the log.  Updated to promises for easier structure.
         var $logResult =  $logPanel.children("."+LogTailerPlus.Constants.LOG_RESULT_CLASS);
         var scrollType = $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL);
@@ -270,18 +307,20 @@ LogTailerPlus = {
         LogTailerPlus.queryLog($logPanel)
             .then(logContents => { return LogTailerPlus.getDelta($logPanel,logContents)})
                 .then(LogTailerPlus.formatResponse)
-                    .then(formattedLog => { LogTailerPlus.appendLog($logResult,formattedLog)});
+                    .then(formattedLog => { return LogTailerPlus.appendLog($logResult,formattedLog)})
+                        .then( appended => {
+                                if( appended ) setTimeout(() => { LogTailerPlus.scrollLog($logPanel)},100)
+                        });
     },
-    addLogPanel: function(logName,refresh,grep,scroll) {
-        console.log(logName,refresh,grep);
+
+
+    addLogPanel: (logName,refresh,grep,scroll) => {
         var hasExisting = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS+"["+LogTailerPlus.Constants.DATA_LOGGER+"='"+logName+"']").length;
         if( hasExisting === 0 ){ // no logs with this path have been added...
             var $logPanel =  $(LogTailerPlus.getHtmlTemplate(logName,refresh,grep,scroll));
             var $splitter = $(LogTailerPlus.getSplitterTemplate(logName));
             //$splitter not in document (yet) and wont be affected..
             $("."+LogTailerPlus.Constants.SPLITTER_CLASS).removeClass(LogTailerPlus.Constants.HIDDEN_CLASS);
-
-            LogTailerPlus.queryLog($logPanel);
             $("."+LogTailerPlus.Constants.PANEL_CONTAINER_CLASS).append($logPanel);
             $("."+LogTailerPlus.Constants.PANEL_CONTAINER_CLASS).append( $splitter);
             //if we want to use jquery-resize, set variable above...
@@ -295,21 +334,16 @@ LogTailerPlus = {
             //run once, then set interval if needed
             LogTailerPlus.tailLog($logPanel);
             if( refresh && refresh > 0 ){
-	            setInterval(function(){
+	            setInterval( () => {
                 	LogTailerPlus.tailLog($logPanel);
             	},refresh*1000);
-
-            	setInterval(function(){
-            	    LogTailerPlus.scrollLog($logPanel)
-            	},100);
-
             }
         }else{//that logs already there - why tail it twice!
 			alert(logName + " is already being tailed.");
         }	
     },
 
-    removeLogPanel: function(button){
+    removeLogPanel: (button) => {
         var numPanels = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS).length;
         var $panel = $(button).parents('.'+LogTailerPlus.Constants.LOG_PANEL_CLASS);
         var logger = $panel.attr(LogTailerPlus.Constants.DATA_LOGGER);

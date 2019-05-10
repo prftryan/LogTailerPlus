@@ -5,7 +5,6 @@ Anything not included in the log-tailer-plus.html is generated dynamically using
 The following variable (values) are referenced in log-tailer-plus.html
 and therefore should be modified with caution:
     * ADD_TAILER_CLASS
-    * ADVANCED_DIALOG_CLASS
     * SELECTED_LOG_CLASS
 */
 
@@ -49,6 +48,8 @@ LogTailerPlus.Constants = {
     SCROLL_FOLLOW: 'follow',
     SCROLL_PIN: 'pin',
 
+    ADV_LOG_CONFIG_FORM: 'advanced-log-config-form',
+    CORAL_FORM_CLASS: "coral-Form coral-Form--aligned u-columnLarge",
 	/* A Stack (in this context) is anything not matching filters.  It is collapsible by default. */
     STACK_CLASS: 'stack',
     STACK_CLOSED_CLASS: 'closed',
