@@ -23,6 +23,10 @@ LogTailerPlus = {
             LogTailerPlus.toggleScroll(event.currentTarget);
         });
 
+        $(document).on("click","."+LogTailerPlus.Constants.UPDATE_LOG_CONFIGS_CLASS, (event) => {
+            LogTailerPlus.updateConfig();
+        });
+
 		$(document).on("click","."+LogTailerPlus.Constants.ADD_TAILER_CLASS,() => {
             var selectedValue = LogTailerPlus.getSelectedLogger();
             if( selectedValue.length > 0 ){
@@ -106,7 +110,8 @@ LogTailerPlus = {
                     innerHTML: LogTailerPlus.generateDialogForm($panel).prop('outerHTML')
                 },
                 footer: {
-                    innerHTML: `<button is="coral-button" variant="secondary" coral-close>Cancel</button><button is="coral-button" variant="primary" coral-close>Update</button>`
+                    innerHTML: `<button is="coral-button" variant="secondary" coral-close>Cancel</button>
+                                <button class="${LogTailerPlus.Constants.UPDATE_LOG_CONFIGS_CLASS}" is="coral-button" variant="primary">Update</button>`
                 }
             });
             dialog.on("close",()=>{
@@ -147,6 +152,16 @@ LogTailerPlus = {
         wrapper.append(`<label class="coral-Form-fieldlabel">${label}</label>`);
         wrapper.append(`<input is="coral-textfield" name="${name}" value="${value}" ${readonlyStr}>`);
        return wrapper;
+    },
+    updateConfig : () =>{
+        var formItems = $("."+LogTailerPlus.Constants.ADV_LOG_CONFIG_FORM).serializeArray();
+        var $panel = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
+        for ( var i = 0 ; i <  formItems.length ; i++ ){
+            var item = formItems[i];
+            if( item.name && item.name.length > 0 ){
+                $panel.attr(item.name,item.value);
+            }
+        }
     },
     /* Use the switch/btn to toggle the data-scroll attribute between pin and follow */
     toggleScroll: (btn) => {
@@ -303,7 +318,13 @@ LogTailerPlus = {
         //this method handles polling the log.  Updated to promises for easier structure.
         var $logResult =  $logPanel.children("."+LogTailerPlus.Constants.LOG_RESULT_CLASS);
         var scrollType = $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL);
-
+        var intervalData = $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO);
+        if( intervalData.refresh !=== $logPanel.attr(LogTailerPlus.Constants.DATA_REFRESH)){
+        //if the data-refresh doesn't match the active interval, cancel the old interval and create a new one
+        //with the updated time.
+            clearLoggerInterval($logPanel);
+            setLoggerInterval($logPanel);
+        }
         LogTailerPlus.queryLog($logPanel)
             .then(logContents => { return LogTailerPlus.getDelta($logPanel,logContents)})
                 .then(LogTailerPlus.formatResponse)
@@ -312,8 +333,25 @@ LogTailerPlus = {
                                 if( appended ) setTimeout(() => { LogTailerPlus.scrollLog($logPanel)},100)
                         });
     },
-
-
+    setLoggerInterval: ($logPanel) => {
+        var refresh = $logPanel.attr(LogTailerPlus.Constants.DATA_REFRESH);
+        if( refresh && refresh > 0 ){
+            $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO, {
+                id: setInterval( () => {
+                           LogTailerPlus.tailLog($logPanel);
+                    });
+                refresh: refresh
+            },refresh*1000));
+        }else{
+            clearLoggerInterval($logPanel);
+        }
+    },
+    clearLoggerInterval : ($logPanel) => {
+        var existingData =  $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO);
+        if( existingData && existingData.id){
+            clearInterval(existingData.id);
+        }
+    },
     addLogPanel: (logName,refresh,grep,scroll) => {
         var hasExisting = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS+"["+LogTailerPlus.Constants.DATA_LOGGER+"='"+logName+"']").length;
         if( hasExisting === 0 ){ // no logs with this path have been added...
@@ -333,11 +371,7 @@ LogTailerPlus = {
             }
             //run once, then set interval if needed
             LogTailerPlus.tailLog($logPanel);
-            if( refresh && refresh > 0 ){
-	            setInterval( () => {
-                	LogTailerPlus.tailLog($logPanel);
-            	},refresh*1000);
-            }
+            LogTailerPlus.setLoggerInterval($logPanel);
         }else{//that logs already there - why tail it twice!
 			alert(logName + " is already being tailed.");
         }	

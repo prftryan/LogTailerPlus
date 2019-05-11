@@ -41,6 +41,7 @@ LogTailerPlus.Constants = {
     ADD_TAILER_CLASS: 'add-tailer',
     ADVANCED_LOG_CONFIG_CLASS: 'advanced-log-config',
     REMOVE_TAILER_CLASS: 'remove-tailer',
+    UPDATE_LOG_CONFIGS_CLASS: 'update-log-configs',
 
     /* Dialog/Property Field Classes */
 
@@ -63,7 +64,7 @@ LogTailerPlus.Constants = {
     DATA_REFRESH: 'data-refresh',
     DATA_GREP: 'data-grep',
     DATA_SCROLL: 'data-scroll',
-
+    DATA_INTERVAL_INFO: 'interval',
 
 	/* SlingLog Constants */
     LOGGER_SERVLET_PATH: '/system/console/slinglog/tailer.txt',
