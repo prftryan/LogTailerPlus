@@ -23,10 +23,6 @@ LogTailerPlus = {
             LogTailerPlus.toggleScroll(event.currentTarget);
         });
 
-        $(document).on("click","."+LogTailerPlus.Constants.UPDATE_LOG_CONFIGS_CLASS, (event) => {
-            LogTailerPlus.updateConfig();
-        });
-
 		$(document).on("click","."+LogTailerPlus.Constants.ADD_TAILER_CLASS,() => {
             var selectedValue = LogTailerPlus.getSelectedLogger();
             if( selectedValue.length > 0 ){
@@ -47,7 +43,8 @@ LogTailerPlus = {
                     ${LogTailerPlus.Constants.DATA_LOGGER}='${logger}'
                     ${LogTailerPlus.Constants.DATA_REFRESH}='${refresh}'
                     ${LogTailerPlus.Constants.DATA_GREP}='${grep}'
-                    ${LogTailerPlus.Constants.DATA_SCROLL}='${scroll}'>
+                    ${LogTailerPlus.Constants.DATA_SCROLL}='${scroll}'
+                    ${LogTailerPlus.Constants.DATA_NUM_LINES}='${LogTailerPlus.Constants.DEFAULT_NUM_LINES}'>
             		<div class='log-panel-header'>
                     	<div class='granite-actionbar foundation-collection-actionbar'>
                         	<div class='granite-actionbar-centerwrapper'>
@@ -99,13 +96,17 @@ LogTailerPlus = {
         read from automagically
      */
     launchDialog: (btn) => {
-        var dialog = $("."+LogTailerPlus.Constants.ADVANCED_DIALOG_CLASS).get(0);
+        var dialog = $("#"+LogTailerPlus.Constants.ADVANCED_DIALOG_ID).get(0);//set doesn't work properly for class, only ID.
+        
         var $panel = $(btn).closest("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
 
         if( !dialog ){
             //first click, lets create the dialog on the fly.
             dialog = new Coral.Dialog().set({
-                class: LogTailerPlus.Constants.ADVANCED_DIALOG_CLASS,
+                id: LogTailerPlus.Constants.ADVANCED_DIALOG_ID,
+                header: {
+                    innerHTML: "Advanced Configuration"
+                },
                 content: {
                     innerHTML: LogTailerPlus.generateDialogForm($panel).prop('outerHTML')
                 },
@@ -114,18 +115,17 @@ LogTailerPlus = {
                                 <button class="${LogTailerPlus.Constants.UPDATE_LOG_CONFIGS_CLASS}" is="coral-button" variant="primary">Update</button>`
                 }
             });
-            dialog.on("close",()=>{
-                    console.log("Closed");
+            $(dialog).on("click","."+LogTailerPlus.Constants.UPDATE_LOG_CONFIGS_CLASS, (event) => {
+                LogTailerPlus.updateConfig(event.currentTarget);
+                dialog.hide();
             });
             $("."+LogTailerPlus.Constants.PANEL_CONTAINER_CLASS).append(dialog);
         }
         var logName = $panel.attr(LogTailerPlus.Constants.DATA_LOGGER);
         dialog.set({
-            header: {
-                innerHTML: "Advanced Configuration: <b>"+logName+"</b>"
-            }
+
         });
-        $("input[name="+LogTailerPlus.Constants.DATA_LOGGER+"]").val(logName);//set the hidden field value.
+        $("input[name="+LogTailerPlus.Constants.DATA_LOGGER+"]").val(logName);//set the hidden field value
         dialog.show();
     },
     generateDialogForm: ($panel) => {
@@ -142,10 +142,15 @@ LogTailerPlus = {
                                             LogTailerPlus.Constants.DATA_GREP,
                                             $panel.attr(LogTailerPlus.Constants.DATA_GREP),
                                             false));
+        $dialogWrapper.append(LogTailerPlus.createFormInput("Lines:",
+                                            LogTailerPlus.Constants.DATA_NUM_LINES,
+                                            $panel.attr(LogTailerPlus.Constants.DATA_NUM_LINES),
+                                            false));
         var $dialogForm = $(`<form class='${LogTailerPlus.Constants.ADV_LOG_CONFIG_FORM} ${LogTailerPlus.Constants.CORAL_FORM_CLASS}'></form>`);
         $dialogForm.append($dialogWrapper);
         return $dialogForm;
     },
+
     createFormInput: (label,name,value,readonly) => {
         var readonlyStr = readonly === true ? "readonly":'';
         var wrapper = $(`<div class="coral-Form-fieldwrapper"></div>`);
@@ -153,9 +158,11 @@ LogTailerPlus = {
         wrapper.append(`<input is="coral-textfield" name="${name}" value="${value}" ${readonlyStr}>`);
        return wrapper;
     },
-    updateConfig : () =>{
+
+    updateConfig : (btn) =>{
+        var logName = $("input[name="+LogTailerPlus.Constants.DATA_LOGGER+"]").val();
         var formItems = $("."+LogTailerPlus.Constants.ADV_LOG_CONFIG_FORM).serializeArray();
-        var $panel = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
+        var $panel = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS+"["+LogTailerPlus.Constants.DATA_LOGGER+"='"+logName+"']");
         for ( var i = 0 ; i <  formItems.length ; i++ ){
             var item = formItems[i];
             if( item.name && item.name.length > 0 ){
@@ -188,10 +195,14 @@ LogTailerPlus = {
             var queryData = {};
             var grep = $logPanel.attr(LogTailerPlus.Constants.DATA_GREP);
             if( !grep || grep === undefined || grep === null || grep.length === 0){
-				grep = LogTailerPlus.Constants.DEFAULT_GREP;
+                grep = LogTailerPlus.Constants.DEFAULT_GREP;
+            }
+            var numLines = $logPanel.attr(LogTailerPlus.Constants.DATA_NUM_LINES);
+            if( !numLines || numLines === undefined || numLines === null || numLines <= 0){
+                numLines = LogTailerPlus.Constants.DATA_NUM_LINES;
             }
             queryData[LogTailerPlus.Constants.LOGGER_NAME_PARAM] = logName;
-            queryData[LogTailerPlus.Constants.LOGGER_TAIL_PARAM] = 100;
+            queryData[LogTailerPlus.Constants.LOGGER_TAIL_PARAM] = numLines;
             queryData[LogTailerPlus.Constants.LOGGER_GREP_PARAM] = grep;
             queryReturn = $.get({
                 url: LogTailerPlus.Constants.LOGGER_SERVLET_PATH,
@@ -319,12 +330,19 @@ LogTailerPlus = {
         var $logResult =  $logPanel.children("."+LogTailerPlus.Constants.LOG_RESULT_CLASS);
         var scrollType = $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL);
         var intervalData = $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO);
-        if( intervalData.refresh !=== $logPanel.attr(LogTailerPlus.Constants.DATA_REFRESH)){
+        var newRefresh = $logPanel.attr(LogTailerPlus.Constants.DATA_REFRESH);
+
+        if( !intervalData || intervalData.refresh !== newRefresh){
         //if the data-refresh doesn't match the active interval, cancel the old interval and create a new one
         //with the updated time.
-            clearLoggerInterval($logPanel);
-            setLoggerInterval($logPanel);
+            if( intervalData ){//only clear if there is an existing one
+                LogTailerPlus.clearLoggerInterval($logPanel);
+            }
+            if( newRefresh !== 0){//only set if the new one is not 0.
+                LogTailerPlus.setLoggerInterval($logPanel);
+            }
         }
+
         LogTailerPlus.queryLog($logPanel)
             .then(logContents => { return LogTailerPlus.getDelta($logPanel,logContents)})
                 .then(LogTailerPlus.formatResponse)
@@ -333,25 +351,27 @@ LogTailerPlus = {
                                 if( appended ) setTimeout(() => { LogTailerPlus.scrollLog($logPanel)},100)
                         });
     },
+
     setLoggerInterval: ($logPanel) => {
         var refresh = $logPanel.attr(LogTailerPlus.Constants.DATA_REFRESH);
         if( refresh && refresh > 0 ){
-            $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO, {
-                id: setInterval( () => {
-                           LogTailerPlus.tailLog($logPanel);
-                    });
-                refresh: refresh
-            },refresh*1000));
-        }else{
-            clearLoggerInterval($logPanel);
+            var intervalId = setInterval( () => { LogTailerPlus.tailLog($logPanel) }, refresh*1000 );
+            $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO,
+                {
+                    id: intervalId,
+                    refresh: refresh
+                }
+            );
         }
     },
+
     clearLoggerInterval : ($logPanel) => {
         var existingData =  $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO);
-        if( existingData && existingData.id){
+        if( existingData !== undefined && existingData.id){
             clearInterval(existingData.id);
         }
     },
+
     addLogPanel: (logName,refresh,grep,scroll) => {
         var hasExisting = $("."+LogTailerPlus.Constants.LOG_PANEL_CLASS+"["+LogTailerPlus.Constants.DATA_LOGGER+"='"+logName+"']").length;
         if( hasExisting === 0 ){ // no logs with this path have been added...
@@ -371,7 +391,6 @@ LogTailerPlus = {
             }
             //run once, then set interval if needed
             LogTailerPlus.tailLog($logPanel);
-            LogTailerPlus.setLoggerInterval($logPanel);
         }else{//that logs already there - why tail it twice!
 			alert(logName + " is already being tailed.");
         }	

@@ -24,6 +24,7 @@ LogTailerPlus.Constants = {
     DEFAULT_GREP: "*",
     DEFAULT_SCROLL: 'follow',
     DEFAULT_STACK_CLOSED: false,
+    DEFAULT_NUM_LINES: 250,//higher lines is more likely to get the complete delta, but will take longer to process.  100-250 range recommended.
 
 
 	/* LogTailerPlus Class Constants */
@@ -32,10 +33,10 @@ LogTailerPlus.Constants = {
     LOG_PANEL_CLASS: "log-panel",
     LOG_TITLE_CLASS: 'log-title',
     LOG_RESULT_CLASS: 'log-result',
-    ADVANCED_DIALOG_CLASS: 'advanced-properties-dialog',
     SELECTED_LOG_CLASS: 'selected-log',
     SCROLL_SWITCH_CLASS: 'scroll-switch',
     /* Dialog/Property Field Related */
+    ADVANCED_DIALOG_ID: 'advanced-properties-dialog',
 
 	/* Button Classes */
     ADD_TAILER_CLASS: 'add-tailer',
@@ -65,6 +66,7 @@ LogTailerPlus.Constants = {
     DATA_GREP: 'data-grep',
     DATA_SCROLL: 'data-scroll',
     DATA_INTERVAL_INFO: 'interval',
+    DATA_NUM_LINES: 'data-delta-lines',
 
 	/* SlingLog Constants */
     LOGGER_SERVLET_PATH: '/system/console/slinglog/tailer.txt',
