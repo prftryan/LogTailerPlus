@@ -3,6 +3,6 @@
     jcr:description="Better skin for viewing logs."
     jcr:primaryType="nt:unstructured"
     jcr:title="Log Tailer"
-    href="/etc/acs-commons/log-tailer-plus.html"
+    href="/apps/log-tailer-plus.html"
     id="acs-commons__log-tailer-plus"
     target="_blank"/>

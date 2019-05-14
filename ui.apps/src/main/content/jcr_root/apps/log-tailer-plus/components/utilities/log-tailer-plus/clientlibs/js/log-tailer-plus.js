@@ -23,6 +23,10 @@ LogTailerPlus = {
             LogTailerPlus.toggleScroll(event.currentTarget);
         });
 
+        $(document).on("click","."+LogTailerPlus.Constants.CLEAR_LOG_CLASS, (event) => {
+            LogTailerPlus.clearLog(event.currentTarget);
+        });
+
 		$(document).on("click","."+LogTailerPlus.Constants.ADD_TAILER_CLASS,() => {
             var selectedValue = LogTailerPlus.getSelectedLogger();
             if( selectedValue.length > 0 ){
@@ -44,7 +48,8 @@ LogTailerPlus = {
                     ${LogTailerPlus.Constants.DATA_REFRESH}='${refresh}'
                     ${LogTailerPlus.Constants.DATA_GREP}='${grep}'
                     ${LogTailerPlus.Constants.DATA_SCROLL}='${scroll}'
-                    ${LogTailerPlus.Constants.DATA_NUM_LINES}='${LogTailerPlus.Constants.DEFAULT_NUM_LINES}'>
+                    ${LogTailerPlus.Constants.DATA_NUM_LINES}='${LogTailerPlus.Constants.DEFAULT_NUM_LINES}'
+                    ${LogTailerPlus.Constants.DATA_MAX_LINES}='${LogTailerPlus.Constants.DEFAULT_MAX_LINES}'>
             		<div class='log-panel-header'>
                     	<div class='granite-actionbar foundation-collection-actionbar'>
                         	<div class='granite-actionbar-centerwrapper'>
@@ -58,9 +63,11 @@ LogTailerPlus = {
                                 <coral-icon id="pinOff" icon="pinOff" size="S" title="Select to pin scroll at current location"></coral-icon>
         					</div>
 					   		<div class='granite-actionbar-right'>
-                                <button is='coral-button' icon='properties' iconsize='S'
+                                <button is='coral-button' icon='exclude' title="Clear Log" iconsize='S'
+                                    class='${LogTailerPlus.Constants.CLEAR_LOG_CLASS}'></button>
+                                <button is='coral-button' icon='properties' title="Update Logger Properties" iconsize='S'
                                     class='${LogTailerPlus.Constants.ADVANCED_LOG_CONFIG_CLASS}'></button>
-					   			<button is='coral-button' icon='closeCircle' iconsize='S'
+					   			<button is='coral-button' icon='closeCircle' title="Remove Log" iconsize='S'
 					   			    class='${LogTailerPlus.Constants.REMOVE_TAILER_CLASS}'></button>
                         	</div>
                     	</div>
@@ -73,7 +80,7 @@ LogTailerPlus = {
         also serves as divider for between loggers if multiple selected.
     */
     getSplitterTemplate: (logger) => {
-        return `<div class='${LogTailerPlus.Constants.SPLITTER_CLASS} ${LogTailerPlus.Constants.HIDDEN_CLASS}'
+        return `<div class='${LogTailerPlus.Constants.SPLITTER_CLASS}'
                     ${LogTailerPlus.Constants.DATA_LOGGER}='${logger}' />`
     },
     /*
@@ -134,7 +141,7 @@ LogTailerPlus = {
                                             LogTailerPlus.Constants.DATA_LOGGER,
                                             $panel.attr(LogTailerPlus.Constants.DATA_LOGGER),
                                             true));
-        $dialogWrapper.append(LogTailerPlus.createFormInput("Refresh:",
+        $dialogWrapper.append(LogTailerPlus.createFormInput("Refresh Rate (seconds):",
                                             LogTailerPlus.Constants.DATA_REFRESH,
                                             $panel.attr(LogTailerPlus.Constants.DATA_REFRESH),
                                             false));
@@ -142,10 +149,15 @@ LogTailerPlus = {
                                             LogTailerPlus.Constants.DATA_GREP,
                                             $panel.attr(LogTailerPlus.Constants.DATA_GREP),
                                             false));
-        $dialogWrapper.append(LogTailerPlus.createFormInput("Lines:",
+        $dialogWrapper.append(LogTailerPlus.createFormInput("Lines per Refresh:",
                                             LogTailerPlus.Constants.DATA_NUM_LINES,
                                             $panel.attr(LogTailerPlus.Constants.DATA_NUM_LINES),
                                             false));
+        $dialogWrapper.append(LogTailerPlus.createFormInput("Truncate After (lines):",
+                                            LogTailerPlus.Constants.DATA_MAX_LINES,
+                                            $panel.attr(LogTailerPlus.Constants.DATA_MAX_LINES),
+                                            false));
+        $dialogWrapper.append('<coral-icon icon="infoCircle" size="s" class="'+LogTailerPlus.Constants.ADV_LOG_INFO_MSG_CLASS+'"> Settings are only applied for newly added messages.</coral-icon>');
         var $dialogForm = $(`<form class='${LogTailerPlus.Constants.ADV_LOG_CONFIG_FORM} ${LogTailerPlus.Constants.CORAL_FORM_CLASS}'></form>`);
         $dialogForm.append($dialogWrapper);
         return $dialogForm;
@@ -176,6 +188,12 @@ LogTailerPlus = {
         var newValue = btn.checked === true ?
             LogTailerPlus.Constants.SCROLL_PIN:LogTailerPlus.Constants.SCROLL_FOLLOW;
         $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL,newValue);
+    },
+    /* clear contents of log... */
+    clearLog: (btn) => {
+        var $logPanel = $(btn).closest("."+LogTailerPlus.Constants.LOG_PANEL_CLASS);
+        var $logResult = $logPanel.children("."+LogTailerPlus.Constants.LOG_RESULT_CLASS);
+        $logResult.empty();
     },
     /* Any content that doesn't match built-in or user highlighting is identified as "stack"
         and can be collapsed.  This is simple class toggler for that (CSS Based) functionality.
@@ -297,11 +315,23 @@ LogTailerPlus = {
         return delta;
     },
     /* appends net new content to log result container*/
-    appendLog: ($logResult,logContents) =>{
+    appendLog: ($logPanel,logContents) =>{
         //in case we need to do any other logic before appending, lets keep this separate.
+        var $logResult =  $logPanel.children("."+LogTailerPlus.Constants.LOG_RESULT_CLASS);
+
         var appended = false;
         if( logContents && logContents.length > 0){
+            var lineNodes = $logResult.children();
+            var maxLines = $logPanel.attr(LogTailerPlus.Constants.DATA_MAX_LINES);
+            if( !maxLines || maxLines <= 0 ){
+                maxLines = LogTailerPlus.Constants.DEFAULT_MAX_LINES;
+            }
+            if( lineNodes.length > maxLines ){
+                //trim messages past truncate limit messages;
+                lineNodes.slice(0,lineNodes.length - maxLines).remove();
+            }
             $logResult.append(logContents);
+
             appended = true;
         }
          return appended;
@@ -346,9 +376,9 @@ LogTailerPlus = {
         LogTailerPlus.queryLog($logPanel)
             .then(logContents => { return LogTailerPlus.getDelta($logPanel,logContents)})
                 .then(LogTailerPlus.formatResponse)
-                    .then(formattedLog => { return LogTailerPlus.appendLog($logResult,formattedLog)})
+                    .then(formattedLog => { return LogTailerPlus.appendLog($logPanel,formattedLog)})
                         .then( appended => {
-                                if( appended ) setTimeout(() => { LogTailerPlus.scrollLog($logPanel)},100)
+                                if( appended ) setTimeout(() => { LogTailerPlus.scrollLog($logPanel)},140)
                         });
     },
 

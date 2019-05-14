@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspaceFilter version="1.0">
-    <filter root="/apps/logtailerplus"/>
-    <filter root="/apps/acs-commons/components/utilities/log-tailer-plus"/>
-    <filter root="/etc/acs-commons/log-tailer-plus"/>
+    <filter root="/apps/log-tailer-plus"/>
+    <!-- shortcut node from acs commons tools, optional -->
     <filter root="/apps/cq/core/content/nav/tools/acs-commons/log-tailer-plus"/>
 </workspaceFilter>

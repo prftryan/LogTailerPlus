@@ -21,8 +21,8 @@
     <!-- P A R E N T  P R O J E C T  D E S C R I P T I O N                      -->
     <!-- ====================================================================== -->
     <parent>
-        <groupId>logtailerplus</groupId>
-        <artifactId>logtailerplus</artifactId>
+        <groupId>log-tailer-plus</groupId>
+        <artifactId>log-tailer-plus</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -30,7 +30,7 @@
     <!-- ====================================================================== -->
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
-    <artifactId>logtailerplus.ui.apps</artifactId>
+    <artifactId>log-tailer-plus.ui.apps</artifactId>
     <packaging>content-package</packaging>
     <name>LogTailer Plus - UI apps</name>
     <description>UI apps package for logtailerplus</description>
@@ -92,21 +92,14 @@
                     <filterSource>src/main/content/META-INF/vault/filter.xml</filterSource>
                     <verbose>true</verbose>
                     <failOnError>true</failOnError>
-                    <group>logtailerplus</group>
+                    <group>${parent.name}</group>
                     <embeddeds>
                         <embedded>
-                            <groupId>logtailerplus</groupId>
-                            <artifactId>logtailerplus.core</artifactId>
-                            <target>/apps/logtailerplus/install</target>
+                            <groupId>log-tailer-plus</groupId>
+                            <artifactId>log-tailer-plus.core</artifactId>
+                            <target>/apps/log-tailer-plus/install</target>
                         </embedded>
                     </embeddeds>
-                    <subPackages>
-                        <subPackage>
-                            <groupId>com.adobe.cq</groupId>
-                            <artifactId>core.wcm.components.all</artifactId>
-                            <filter>true</filter>
-                        </subPackage>
-                    </subPackages>
                 </configuration>
             </plugin>
 
@@ -122,8 +115,8 @@
     <!-- ====================================================================== -->
     <dependencies>
         <dependency>
-            <groupId>logtailerplus</groupId>
-            <artifactId>logtailerplus.core</artifactId>
+            <groupId>log-tailer-plus</groupId>
+            <artifactId>log-tailer-plus.core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -131,12 +124,6 @@
             <groupId>com.adobe.aem</groupId>
             <artifactId>uber-jar</artifactId>
             <classifier>apis</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>com.adobe.cq</groupId>
-            <artifactId>core.wcm.components.all</artifactId>
-            <type>zip</type>
         </dependency>
 
         <dependency>

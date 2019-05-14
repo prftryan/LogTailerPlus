@@ -12,14 +12,51 @@ body {
   overflow: auto;
 }
 
+.advanced-log-config-form.coral-Form--aligned .coral-Form-fieldlabel {
+    min-width: 8rem;
+}
+
+.advanced_log_info {
+    font-size:1rem;
+
+}
+
+.panel-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  height:100%;
+
+ .splitter {
+        flex: 0 0 auto;
+        width: 18px;
+        height: 100%;
+        cursor: col-resize;
+        background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #656565;
+    }
+
+    .splitter:last-child {
+            display:none;
+    }
+}
+
+.hidden {
+	display:none;
+}
+
+
+
 .log-panel {
     flex: 1 1 auto;
-    min-width:150px;
+    min-width:600px;/*UI starts getting funky after that..*/
+    width:50%;
     height:100%;
     .granite-actionbar {
 		background-color: #656565; 
 	    color: #fff;
     }
+
     .log-title {
 		color:#fff;
         text-transform:uppercase;
@@ -28,21 +65,19 @@ body {
     .log-panel-header {
 		height:50px;
         display: block;
-        .advanced-log-config {
-			margin-right:10px;
+        button,coral-switch {
+			margin-right:5px;
+			margin-left:5px;
         }
-        .scroll-switch {
-            margin-left:10px;
-            margin-right:10px;
-        }
+
     }
     .log-result {
 		overflow:auto;
 		height: ~"calc(100% - 50px)";
-        white-space:pre-wrap;
         margin:0;
 
         span {
+            white-space:pre-wrap;
 			width: 100%;
             display: inline-block;
         }
@@ -103,22 +138,3 @@ body {
 
 
 
-.panel-container {
-  display: flex;
-  flex-direction: row;  
-  flex-wrap: nowrap;
-  width: 100%;
-  height:100%;
-}
-
-.hidden {
-	display:none;
-}  
-
-.splitter {
-    flex: 0 0 auto;
-    width: 18px;
-    height: 100%;
-    cursor: col-resize;  
-    background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #656565;
-}

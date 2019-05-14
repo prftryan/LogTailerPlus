@@ -24,7 +24,8 @@ LogTailerPlus.Constants = {
     DEFAULT_GREP: "*",
     DEFAULT_SCROLL: 'follow',
     DEFAULT_STACK_CLOSED: false,
-    DEFAULT_NUM_LINES: 250,//higher lines is more likely to get the complete delta, but will take longer to process.  100-250 range recommended.
+    DEFAULT_NUM_LINES: 250,//higher lines is more likely to get the complete delta, but will take longer to process.  100-350 range recommended.
+    DEFAULT_MAX_LINES: 5000,//how many lines of history to store before truncating.
 
 
 	/* LogTailerPlus Class Constants */
@@ -43,6 +44,7 @@ LogTailerPlus.Constants = {
     ADVANCED_LOG_CONFIG_CLASS: 'advanced-log-config',
     REMOVE_TAILER_CLASS: 'remove-tailer',
     UPDATE_LOG_CONFIGS_CLASS: 'update-log-configs',
+    ADV_LOG_INFO_MSG_CLASS: 'advanced-log-info',
 
     /* Dialog/Property Field Classes */
 
@@ -67,7 +69,7 @@ LogTailerPlus.Constants = {
     DATA_SCROLL: 'data-scroll',
     DATA_INTERVAL_INFO: 'interval',
     DATA_NUM_LINES: 'data-delta-lines',
-
+    DATA_MAX_LINES: 'data-max-lines',
 	/* SlingLog Constants */
     LOGGER_SERVLET_PATH: '/system/console/slinglog/tailer.txt',
     LOGGER_GREP_PARAM: 'grep',

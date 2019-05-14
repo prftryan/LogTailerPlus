@@ -2,15 +2,10 @@ package logtailerplus.core.models;
 
 import java.util.*;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.annotation.PostConstruct;
 
-import com.adobe.aemds.guide.service.JsonObjectCreator;
-import org.apache.jackrabbit.commons.json.JsonHandler;
-import org.apache.jackrabbit.commons.json.JsonParser;
-import org.apache.jackrabbit.commons.json.JsonUtil;
-import org.apache.jackrabbit.oak.commons.json.JsonObject;
-import org.apache.jackrabbit.oak.json.JsonSerializer;
+
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.commons.osgi.PropertiesUtil;
@@ -18,7 +13,6 @@ import org.apache.sling.api.SlingHttpServletRequest;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
