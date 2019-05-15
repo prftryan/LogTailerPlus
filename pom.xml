@@ -19,7 +19,7 @@
     <groupId>log-tailer-plus</groupId>
     <artifactId>log-tailer-plus</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>Log Tailer Plus</name>
     <description>LogTailer Plus - Add better logging to AEM ClientSide</description>
 
@@ -478,21 +478,15 @@
             <dependency>
                 <groupId>com.adobe.aem</groupId>
                 <artifactId>uber-jar</artifactId>
-                <version>6.3.0</version>
+                <version>6.2.0-SP1</version>
                 <classifier>apis</classifier>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.adobe.cq</groupId>
-                <artifactId>core.wcm.components.all</artifactId>
-                <type>zip</type>
-                <version>2.0.4</version>
             </dependency>
             <!-- Apache Sling Dependencies -->
             <dependency>
                 <groupId>org.apache.sling</groupId>
                 <artifactId>org.apache.sling.models.api</artifactId>
-                <version>1.0.0</version>
+                <version>1.2.2</version>
                 <scope>provided</scope>
             </dependency>
             <!-- Servlet API -->
