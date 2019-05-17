@@ -3,9 +3,9 @@
         <title>Log Tailer Plus</title>
         <sly data-sly-use.clientlib="/libs/granite/sightly/templates/clientlib.html">
             <sly data-sly-call="${clientlib.css @ categories='log-tailer-plus.app'}"/>
-			<sly data-sly-call="${clientlib.css @ categories=['coralui3','granite.ui.coral.foundation','granite.ui.shell']}"/>
+            <sly data-sly-call="${clientlib.css @ categories=['coralui3','granite.ui.coral.foundation','granite.ui.shell']}"/>
         </sly>
-		<link rel="shortcut icon" href="/apps/log-tailer-plus/components/utilities/log-tailer-plus/clientlibs/images/favicon.ico" />
+        <link rel="shortcut icon" href="/apps/log-tailer-plus/components/utilities/log-tailer-plus/clientlibs/images/favicon.ico" />
     </head>
     <body class="coral--light" data-sly-use.logtailerplus="logtailerplus.core.models.LogTailerPlus">
         <coral-shell>
@@ -27,28 +27,26 @@
                             <div class="granite-actionbar-right">
                                 <coral-select class='selected-log' placeholder="Select Log...">
                                       <coral-select-item data-sly-repeat=${logtailerplus.logNames}>
-										${item}
+                                        ${item}
                                       </coral-select-item>
                                     </coral-select>
-								<button is="coral-button" icon="addCircle" iconsize="S" class="add-tailer">Add Log</button>
+                                <button is="coral-button" icon="addCircle" iconsize="S" class="add-tailer">Add Log</button>
                             </div>
                         </div>                    
                     </div>
                     <div class="foundation-layout-panel-bodywrapper">
                         <div class="foundation-layout-panel-body">
                             <div class="foundation-layout-panel-content">
-                            	<div class="panel-container">
-									<!--/*logs go here...*/-->                                                        
-                            	</div>
+                                <div class="panel-container">
+                                    <!--/*logs go here...*/-->                                                        
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </coral-shell-content>
         </coral-shell>
-<sly data-sly-call="${clientlib.js 
-@ categories=['coralui3','granite.ui.coral.foundation','granite.ui.shell']}"/>
-        <sly data-sly-call="${clientlib.js 
-@ categories='log-tailer-plus.app'}"/>
+        <sly data-sly-call="${clientlib.js @ categories=['coralui3','granite.ui.coral.foundation','granite.ui.shell']}"/>
+        <sly data-sly-call="${clientlib.js @ categories='log-tailer-plus.app'}"/>
     </body>
 </html>
