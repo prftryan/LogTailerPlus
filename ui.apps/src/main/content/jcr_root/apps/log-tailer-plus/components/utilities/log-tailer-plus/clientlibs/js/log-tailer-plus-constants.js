@@ -28,8 +28,8 @@ LogTailerPlus.Constants = {
     DEFAULT_MAX_LINES: 5000,//how many lines of history to store before truncating.
 
 
-	/* LogTailerPlus Class Constants */
-    HIDDEN_CLASS:	'hidden',
+    /* LogTailerPlus Class Constants */
+    HIDDEN_CLASS:    'hidden',
     PANEL_CONTAINER_CLASS: 'panel-container',
     LOG_PANEL_CLASS: "log-panel",
     LOG_TITLE_CLASS: 'log-title',
@@ -39,7 +39,7 @@ LogTailerPlus.Constants = {
     /* Dialog/Property Field Related */
     ADVANCED_DIALOG_ID: 'advanced-properties-dialog',
 
-	/* Button Classes */
+    /* Button Classes */
     ADD_TAILER_CLASS: 'add-tailer',
     ADVANCED_LOG_CONFIG_CLASS: 'advanced-log-config',
     REMOVE_TAILER_CLASS: 'remove-tailer',
@@ -54,7 +54,7 @@ LogTailerPlus.Constants = {
 
     ADV_LOG_CONFIG_FORM: 'advanced-log-config-form',
     CORAL_FORM_CLASS: "coral-Form coral-Form--aligned u-columnLarge",
-	/* A Stack (in this context) is anything not matching filters.  It is collapsible by default. */
+    /* A Stack (in this context) is anything not matching filters.  It is collapsible by default. */
     STACK_CLASS: 'stack',
     STACK_CLOSED_CLASS: 'closed',
     STACK_ICON_CLASS: 'stack-icon',
@@ -70,7 +70,7 @@ LogTailerPlus.Constants = {
     DATA_INTERVAL_INFO: 'interval',
     DATA_NUM_LINES: 'data-delta-lines',
     DATA_MAX_LINES: 'data-max-lines',
-	/* SlingLog Constants */
+    /* SlingLog Constants */
     LOGGER_SERVLET_PATH: '/system/console/slinglog/tailer.txt',
     LOGGER_GREP_PARAM: 'grep',
     LOGGER_TAIL_PARAM: 'tail',
