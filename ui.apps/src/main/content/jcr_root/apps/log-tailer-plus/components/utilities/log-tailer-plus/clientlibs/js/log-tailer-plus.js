@@ -49,7 +49,8 @@ LogTailerPlus = {
                     ${LogTailerPlus.Constants.DATA_GREP}='${grep}'
                     ${LogTailerPlus.Constants.DATA_SCROLL}='${scroll}'
                     ${LogTailerPlus.Constants.DATA_NUM_LINES}='${LogTailerPlus.Constants.DEFAULT_NUM_LINES}'
-                    ${LogTailerPlus.Constants.DATA_MAX_LINES}='${LogTailerPlus.Constants.DEFAULT_MAX_LINES}'>
+                    ${LogTailerPlus.Constants.DATA_MAX_LINES}='${LogTailerPlus.Constants.DEFAULT_MAX_LINES}'
+                    ${LogTailerPlus.Constants.DATA_WORD_WRAP}='${LogTailerPlus.Constants.DEFAULT_WORD_WRAP}'>
                     <div class='log-panel-header'>
                         <div class='granite-actionbar foundation-collection-actionbar'>
                             <div class='granite-actionbar-centerwrapper'>
@@ -190,6 +191,7 @@ LogTailerPlus = {
         $dialogWrapper.append(
             `<div class="coral-Form-fieldwrapper">
                 <label class="coral-Form-fieldlabel">Wrap Lines:</label>
+                <input type='hidden' name='data-word-wrap' value=''/>
                 <coral-switch name="data-word-wrap" value="checked" ${wordWrapChecked}></coral-switch>
             </div>`
         );
