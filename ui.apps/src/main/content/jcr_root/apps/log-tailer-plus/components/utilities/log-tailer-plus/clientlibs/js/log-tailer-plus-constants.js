@@ -71,6 +71,7 @@ LogTailerPlus.Constants = {
     DATA_NUM_LINES: 'data-delta-lines',
     DATA_OBSERVER: 'observer',
     DATA_MAX_LINES: 'data-max-lines',
+    DATA_WORD_WRAP: 'data-word-wrap',
     /* SlingLog Constants */
     LOGGER_SERVLET_PATH: '/system/console/slinglog/tailer.txt',
     LOGGER_GREP_PARAM: 'grep',
