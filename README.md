@@ -52,6 +52,9 @@ This setting will tell your browser how much history to keep.  It defaults to 50
 
 **Default**: 5000 items
 
+#### Wrap Lines
+This setting will adjust whether the logger will auto-wrap the longer lines to the next (true) or to use a horizontal scroll(false)
+
 #### Clear Log
 The clear log is done through the log header.  It will delete all existing contents from the Log Tailer.
 
