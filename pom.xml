@@ -19,7 +19,7 @@
     <groupId>log-tailer-plus</groupId>
     <artifactId>log-tailer-plus</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>Log Tailer Plus</name>
     <description>LogTailer Plus - Add better logging to AEM ClientSide</description>
 
