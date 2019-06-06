@@ -20,7 +20,7 @@
     <parent>
         <groupId>log-tailer-plus</groupId>
         <artifactId>log-tailer-plus</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>log-tailer-plus.core</artifactId>
