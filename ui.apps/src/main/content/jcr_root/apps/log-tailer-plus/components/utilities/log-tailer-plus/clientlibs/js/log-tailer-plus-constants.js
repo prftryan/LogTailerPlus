@@ -69,6 +69,7 @@ LogTailerPlus.Constants = {
     DATA_SCROLL: 'data-scroll',
     DATA_INTERVAL_INFO: 'interval',
     DATA_NUM_LINES: 'data-delta-lines',
+    DATA_OBSERVER: 'observer',
     DATA_MAX_LINES: 'data-max-lines',
     /* SlingLog Constants */
     LOGGER_SERVLET_PATH: '/system/console/slinglog/tailer.txt',

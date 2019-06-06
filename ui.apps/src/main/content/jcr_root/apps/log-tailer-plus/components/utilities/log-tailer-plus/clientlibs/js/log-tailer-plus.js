@@ -376,7 +376,16 @@ LogTailerPlus = {
         }
         return appended;
     },
-
+    addObserver: ($logPanel) => {
+        var $logResult = $logPanel.children("." + LogTailerPlus.Constants.LOG_RESULT_CLASS);
+        // create an observer instance
+        var observer = new MutationObserver(function(mutations) {
+           LogTailerPlus.scrollLog($logPanel);
+        });
+        var config = { attributes: false, childList: true, characterData: false }
+        observer.observe($logResult.get(0), config);
+        $logPanel.data(LogTailerPlus.Constants.DATA_OBSERVER,observer);
+    },
     /** Simple method to scroll the log window to either bottom or wherever was pinned */
     scrollLog: ($logPanel) => {
         var $logResult = $logPanel.children("." + LogTailerPlus.Constants.LOG_RESULT_CLASS);
@@ -398,8 +407,6 @@ LogTailerPlus = {
      */
     tailLog: ($logPanel) => {
         // this method handles polling the log.  Updated to promises for easier structure.
-        // var $logResult = $logPanel.children("." + LogTailerPlus.Constants.LOG_RESULT_CLASS);
-        // var scrollType = $logPanel.attr(LogTailerPlus.Constants.DATA_SCROLL);
         var intervalData = $logPanel.data(LogTailerPlus.Constants.DATA_INTERVAL_INFO);
         var newRefresh = $logPanel.attr(LogTailerPlus.Constants.DATA_REFRESH);
 
@@ -417,10 +424,7 @@ LogTailerPlus = {
         LogTailerPlus.queryLog($logPanel)
             .then(logContents => LogTailerPlus.getDelta($logPanel, logContents))
             .then(LogTailerPlus.formatResponse)
-            .then(formattedLog => LogTailerPlus.appendLog($logPanel, formattedLog))
-            .then(appended => {
-                if (appended) setTimeout(() => { LogTailerPlus.scrollLog($logPanel) }, 140)
-            });
+            .then(formattedLog => LogTailerPlus.appendLog($logPanel, formattedLog));
     },
 
     setLoggerInterval: ($logPanel) => {
@@ -463,6 +467,10 @@ LogTailerPlus = {
             }
             //run once, then set interval if needed
             LogTailerPlus.tailLog($logPanel);
+            //set up mutation observer for the scroll to bottom(tail) behavior.
+            LogTailerPlus.addObserver($logPanel);
+
+
         } else {//that logs already there - why tail it twice!
             alert(logName + " is already being tailed.");
         }
@@ -472,6 +480,10 @@ LogTailerPlus = {
         var numPanels = $("." + LogTailerPlus.Constants.LOG_PANEL_CLASS).length;
         var $panel = $(button).parents('.' + LogTailerPlus.Constants.LOG_PANEL_CLASS);
         var logger = $panel.attr(LogTailerPlus.Constants.DATA_LOGGER);
+        var observer = panel.data(LogTailerPlus.Constants.DATA_OBSERVER);
+        if (observer){
+            observer.disconnect();
+        }
         $panel.siblings("." + LogTailerPlus.Constants.SPLITTER_CLASS + "[" + LogTailerPlus.Constants.DATA_LOGGER + "='" + logger + "']").first().remove();
         $panel.remove();
     }
