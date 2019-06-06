@@ -26,7 +26,7 @@ LogTailerPlus.Constants = {
     DEFAULT_STACK_CLOSED: false,
     DEFAULT_NUM_LINES: 250,//higher lines is more likely to get the complete delta, but will take longer to process.  100-350 range recommended.
     DEFAULT_MAX_LINES: 5000,//how many lines of history to store before truncating.
-
+    DEFAULT_WORD_WRAP: 'checked',
 
     /* LogTailerPlus Class Constants */
     HIDDEN_CLASS:    'hidden',
