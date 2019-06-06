@@ -139,9 +139,20 @@ LogTailerPlus = {
             $("." + LogTailerPlus.Constants.PANEL_CONTAINER_CLASS).append(dialog);
         }
         var logName = $panel.attr(LogTailerPlus.Constants.DATA_LOGGER);
-        //TODO:set values to match the panel selected
+        var inputs = $(dialog).find("input");
+        for( var i = 0; i < inputs.length ; i++ ){
+            var input = inputs.get(i);
+            if( input.type === 'hidden'){
+                continue;
+            }else if( input.name === LogTailerPlus.Constants.DATA_WORD_WRAP ){
+                var toggle = $(input).parent().get(0);
+                toggle.set({ checked: $panel.attr(LogTailerPlus.Constants.DATA_WORD_WRAP) === "checked" ? true:false });
+            }else{
+                input.value = $panel.attr(input.name);
+            }
+        }
         //set the hidden field value
-        $("input[name=" + LogTailerPlus.Constants.DATA_LOGGER + "]").val(logName);
+        //$("input[name=" + LogTailerPlus.Constants.DATA_LOGGER + "]").val(logName);
         dialog.show();
     },
     generateDialogForm: ($panel) => {
