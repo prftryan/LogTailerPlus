@@ -138,13 +138,15 @@ LogTailerPlus = {
             $("." + LogTailerPlus.Constants.PANEL_CONTAINER_CLASS).append(dialog);
         }
         var logName = $panel.attr(LogTailerPlus.Constants.DATA_LOGGER);
-        dialog.set({}); // TODO: document this ?
+        //TODO:set values to match the panel selected
         //set the hidden field value
         $("input[name=" + LogTailerPlus.Constants.DATA_LOGGER + "]").val(logName);
         dialog.show();
     },
     generateDialogForm: ($panel) => {
         var $dialogWrapper = $(`<section class="coral-Form-fieldset"></section>`);
+        var wordWrapChecked = $panel.attr(LogTailerPlus.Constants.DATA_WORD_WRAP) ? "checked":"";
+
         $dialogWrapper.append(
             LogTailerPlus.createFormInput(
                 "Logger:",
@@ -184,6 +186,12 @@ LogTailerPlus = {
                 $panel.attr(LogTailerPlus.Constants.DATA_MAX_LINES),
                 false
             )
+        );
+        $dialogWrapper.append(
+            `<div class="coral-Form-fieldwrapper">
+                <label class="coral-Form-fieldlabel">Wrap Lines:</label>
+                <coral-switch name="data-word-wrap" value="checked" ${wordWrapChecked}></coral-switch>
+            </div>`
         );
         $dialogWrapper.append(
             `<coral-icon icon="infoCircle" size="s" class="${LogTailerPlus.Constants.ADV_LOG_INFO_MSG_CLASS}">
