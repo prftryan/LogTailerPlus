@@ -112,7 +112,6 @@ LogTailerPlus = {
      * that the tailLog will read from automagically
      */
     launchDialog: (btn) => {
-        
         // set doesn't work properly for class, only ID.
         var dialog = $("#" + LogTailerPlus.Constants.ADVANCED_DIALOG_ID).get(0);
         var $panel = $(btn).closest("." + LogTailerPlus.Constants.LOG_PANEL_CLASS);
@@ -142,17 +141,15 @@ LogTailerPlus = {
         var inputs = $(dialog).find("input");
         for( var i = 0; i < inputs.length ; i++ ){
             var input = inputs.get(i);
-            if( input.type === 'hidden'){
+            if( input.type === 'hidden'){//don't mess with the hidden dialog fields...
                 continue;
-            }else if( input.name === LogTailerPlus.Constants.DATA_WORD_WRAP ){
+            }else if( input.name === LogTailerPlus.Constants.DATA_WORD_WRAP ){ //word-wrap is special - Yay checkboxes.
                 var toggle = $(input).parent().get(0);
                 toggle.set({ checked: $panel.attr(LogTailerPlus.Constants.DATA_WORD_WRAP) === "checked" ? true:false });
             }else{
                 input.value = $panel.attr(input.name);
             }
         }
-        //set the hidden field value
-        //$("input[name=" + LogTailerPlus.Constants.DATA_LOGGER + "]").val(logName);
         dialog.show();
     },
     generateDialogForm: ($panel) => {
